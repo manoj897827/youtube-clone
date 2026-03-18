@@ -20,7 +20,7 @@ function Home({ searchTerm }) {
             q: searchTerm,
             maxResults: 12,
             type: "video",
-            key: "AIzaSyANyn_nV-HvaMeOb7vJx_la2VyUElSVGGg"
+            key: process.env.REACT_APP_YOUTUBE_API_KEY
           }
         });
 
