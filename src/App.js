@@ -4,7 +4,10 @@ import Sidebar from "./components/Sidebar";
 import Home from "./pages/Home";
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState("trending");
+  const [searchTerm, setSearchTerm] = useState(() => {
+    // Load last search from localStorage or default to trending
+    return localStorage.getItem("lastSearch") || "trending";
+  });
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect if screen is mobile
@@ -15,6 +18,20 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Save last search term to localStorage
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    localStorage.setItem("lastSearch", term);
+
+    // Save full history as array
+    let history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+    if (!history.includes(term)) {
+      history.unshift(term);
+      if (history.length > 10) history.pop(); // Keep last 10 searches
+      localStorage.setItem("searchHistory", JSON.stringify(history));
+    }
+  };
+
   return (
     <div
       style={{
@@ -23,11 +40,10 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {/* Show Sidebar only on desktop */}
-      {!isMobile && <Sidebar onCategorySelect={setSearchTerm} />}
+      {!isMobile && <Sidebar onCategorySelect={handleSearch} />}
 
       <div style={{ flex: 1 }}>
-        <Navbar onSearch={setSearchTerm} />
+        <Navbar onSearch={handleSearch} />
         <Home searchTerm={searchTerm} />
       </div>
     </div>

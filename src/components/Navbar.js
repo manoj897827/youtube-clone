@@ -13,8 +13,10 @@ function Navbar({ onSearch }) {
   }, []);
 
   const handleSearch = () => {
-    if (input.trim() !== "") {
-      onSearch(input);
+    const term = input.trim();
+    if (term !== "") {
+      onSearch(term); // This now also updates localStorage via App.js
+      setInput("");    // Optional: clear input after search
     }
   };
 
@@ -29,7 +31,7 @@ function Navbar({ onSearch }) {
         gap: isMobile ? "10px" : "20px",
       }}
     >
-      {/* 🔴 LOGO */}
+      {/* LOGO */}
       <div
         style={{
           display: "flex",
@@ -43,7 +45,7 @@ function Navbar({ onSearch }) {
         <span style={{ marginLeft: "8px" }}>ManojTube</span>
       </div>
 
-      {/* 🔍 SEARCH */}
+      {/* SEARCH */}
       <div style={{ display: "flex", flex: 1, width: "100%" }}>
         <input
           value={input}

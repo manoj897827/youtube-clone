@@ -5,6 +5,7 @@ function RecommendedVideos() {
   const [videos, setVideos] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
@@ -15,14 +16,32 @@ function RecommendedVideos() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await youtube.get("/search", {
-          params: { q: "technology" },
-        });
-        setVideos(response.data.items);
+        // Load search history from localStorage
+        const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+        const queries = history.length ? history.slice(0, 3) : ["trending"]; // top 3 searches
+
+        let combinedVideos = [];
+
+        // Fetch videos for each recent search term
+        for (let term of queries) {
+          const response = await youtube.get("/search", {
+            params: {
+              part: "snippet",
+              q: term,
+              maxResults: 4, // fetch 4 videos per term
+              type: "video",
+              key: process.env.REACT_APP_YOUTUBE_API_KEY,
+            },
+          });
+          combinedVideos = combinedVideos.concat(response.data.items);
+        }
+
+        setVideos(combinedVideos);
       } catch (error) {
-        console.log(error);
+        console.log("API ERROR:", error);
       }
     };
+
     fetchVideos();
   }, []);
 
@@ -36,7 +55,9 @@ function RecommendedVideos() {
         background: "#0f0f0f",
         color: "white",
         display: "grid",
-        gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(250px, 1fr))",
+        gridTemplateColumns: isMobile
+          ? "1fr"
+          : "repeat(auto-fill, minmax(250px, 1fr))",
         gap: "15px",
       }}
     >
