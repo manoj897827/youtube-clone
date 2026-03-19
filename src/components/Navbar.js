@@ -15,8 +15,14 @@ function Navbar({ onSearch }) {
   const handleSearch = () => {
     const term = input.trim();
     if (term !== "") {
-      onSearch(term); // This now also updates localStorage via App.js
-      setInput("");    // Optional: clear input after search
+      const history =
+        JSON.parse(localStorage.getItem("searchHistory")) || [];
+
+      history.push(term);
+      localStorage.setItem("searchHistory", JSON.stringify(history));
+
+      onSearch(term);
+      setInput("");
     }
   };
 
@@ -31,48 +37,20 @@ function Navbar({ onSearch }) {
         gap: isMobile ? "10px" : "20px",
       }}
     >
-      {/* LOGO */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          fontSize: isMobile ? "18px" : "20px",
-          fontWeight: "bold",
-          color: "white",
-        }}
-      >
-        <FaYoutube color="red" size={isMobile ? 24 : 28} />
+      <div style={{ display: "flex", alignItems: "center", color: "white" }}>
+        <FaYoutube color="red" size={24} />
         <span style={{ marginLeft: "8px" }}>ManojTube</span>
       </div>
 
-      {/* SEARCH */}
       <div style={{ display: "flex", flex: 1, width: "100%" }}>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSearch();
-          }}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           placeholder="Search"
-          style={{
-            flex: 1,
-            padding: isMobile ? "8px" : "8px",
-            border: "none",
-            outline: "none",
-            fontSize: isMobile ? "16px" : "14px",
-          }}
+          style={{ flex: 1, padding: "8px" }}
         />
-        <button
-          onClick={handleSearch}
-          style={{
-            padding: isMobile ? "8px 12px" : "6px 12px",
-            fontSize: isMobile ? "16px" : "14px",
-            marginLeft: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Search
-        </button>
+        <button onClick={handleSearch}>Search</button>
       </div>
     </div>
   );

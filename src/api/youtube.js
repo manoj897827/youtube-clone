@@ -1,5 +1,7 @@
 import axios from "axios";
 
-export default axios.create({
-  baseURL: "https://www.googleapis.com/youtube/v3"
+const youtube = axios.create({
+  baseURL: "https://www.googleapis.com/youtube/v3",
 });
+
+export default youtube;

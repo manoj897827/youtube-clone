@@ -37,7 +37,7 @@ function VideoPlayer({ video, onBack }) {
         style={{
           position: "relative",
           width: "100%",
-          paddingBottom: "56.25%", // 16:9 aspect ratio
+          paddingBottom: "56.25%", // 16:9 ratio
         }}
       >
         <iframe

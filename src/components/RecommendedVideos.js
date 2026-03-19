@@ -5,7 +5,7 @@ function RecommendedVideos() {
   const [videos, setVideos] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile
+  // 📱 Detect mobile
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
@@ -16,27 +16,44 @@ function RecommendedVideos() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        // Load search history from localStorage
         const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
-        const queries = history.length ? history.slice(0, 3) : ["trending"]; // top 3 searches
+
+        let queries = [];
+
+        if (history.length > 0) {
+          // 🔥 Count frequency of search terms
+          const freqMap = {};
+          history.forEach(term => {
+            freqMap[term] = (freqMap[term] || 0) + 1;
+          });
+
+          // 🔥 Sort by most frequent
+          queries = Object.keys(freqMap)
+            .sort((a, b) => freqMap[b] - freqMap[a])
+            .slice(0, 3); // top 3 searches
+        } else {
+          queries = ["trending"];
+        }
 
         let combinedVideos = [];
 
-        // Fetch videos for each recent search term
+        // 🔥 Fetch videos for each top query
         for (let term of queries) {
           const response = await youtube.get("/search", {
             params: {
               part: "snippet",
               q: term,
-              maxResults: 4, // fetch 4 videos per term
+              maxResults: 4,
               type: "video",
-              key: process.env.REACT_APP_YOUTUBE_API_KEY,
-            },
+              key: process.env.REACT_APP_YOUTUBE_API_KEY
+            }
           });
-          combinedVideos = combinedVideos.concat(response.data.items);
+
+          combinedVideos = [...combinedVideos, ...response.data.items];
         }
 
         setVideos(combinedVideos);
+
       } catch (error) {
         console.log("API ERROR:", error);
       }
@@ -63,6 +80,7 @@ function RecommendedVideos() {
     >
       {videos.map((video) => {
         if (!video.id.videoId) return null;
+
         return (
           <a
             key={video.id.videoId}
